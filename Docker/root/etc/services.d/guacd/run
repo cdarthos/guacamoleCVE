@@ -1,0 +1,4 @@
+#!/bin/bash
+
+echo "Starting guacamole guacd..."
+s6-setuidgid root guacd -f

@@ -1,0 +1,99 @@
+# Dockerfile
+# syntax=docker/dockerfile:1
+
+# Dockerfile
+FROM tomcat:7.0.109-jdk8-openjdk-slim
+#
+#RUN echo 'deb  http://ftp.de.debian.org/debian/  oldoldstable main contrib non-free' >> /etc/apt/sources.list
+#RUN echo 'deb-src  http://ftp.de.debian.org/debian/  oldoldstable main contrib non-free' >> /etc/apt/sources.list
+#RUN echo 'deb  http://ftp.de.debian.org/debian/  oldstable main contrib non-free' >> /etc/apt/sources.list
+#RUN echo 'deb-src  http://ftp.de.debian.org/debian/  oldstable main contrib non-free' >> /etc/apt/sources.list
+#RUN echo 'deb  http://ftp.de.debian.org/debian/  stable main contrib non-free' >> /etc/apt/sources.list
+#RUN echo 'deb-src  http://ftp.de.debian.org/debian/  stable main contrib non-free' >> /etc/apt/sources.list
+#
+#
+RUN apt-get update
+#
+#RUN apt-get install -y gcc-6 g++-6
+#RUN ln -s /usr/bin/gcc-6 /usr/bin/gcc
+#
+RUN apt-get install -y \
+    wget
+
+
+
+RUN mkdir /etc/guacamole
+RUN wget https://archive.apache.org/dist/guacamole/0.9.14/binary/guacamole-0.9.14.war -P ~
+RUN mv ~/guacamole-0.9.14.war /etc/guacamole/guacamole.war
+
+RUN ls /usr/local/tomcat
+RUN ln -s /etc/guacamole/guacamole.war /usr/local/tomcat/webapps/guacamole.war
+RUN ln -s /etc/guacamole /usr/local/tomcat/.guacamole
+
+#RUN ln -s /etc/init.d/guacd  S95guacd b
+
+
+RUN echo 'deb  http://ftp.de.debian.org/debian/  oldoldstable main contrib non-free' >> /etc/apt/sources.list
+RUN echo 'deb-src  http://ftp.de.debian.org/debian/  oldoldstable main contrib non-free' >> /etc/apt/sources.list
+RUN echo 'deb  http://ftp.de.debian.org/debian/  oldstable main contrib non-free' >> /etc/apt/sources.list
+RUN echo 'deb-src  http://ftp.de.debian.org/debian/  oldstable main contrib non-free' >> /etc/apt/sources.list
+RUN echo 'deb  http://ftp.de.debian.org/debian/  stable main contrib non-free' >> /etc/apt/sources.list
+RUN echo 'deb-src  http://ftp.de.debian.org/debian/  stable main contrib non-free' >> /etc/apt/sources.list
+#
+#
+RUN apt-get update
+#
+RUN apt-get install -y gcc-6 g++-6
+RUN ln -s /usr/bin/gcc-6 /usr/bin/gcc
+#
+RUN apt-get install -y \
+    wget \
+    libcairo2-dev 	\
+    libjpeg62-turbo-dev \
+    libpng-dev \
+    libossp-uuid-dev \
+    libpango1.0-dev \
+    libssh2-1-dev \
+    libssl-dev \
+    uuid-dev \
+    make
+
+RUN mkdir "/temp"
+WORKDIR /temp
+RUN wget https://archive.apache.org/dist/guacamole/0.9.14/source/guacamole-server-0.9.14.tar.gz
+RUN tar xzf guacamole-server-0.9.14.tar.gz
+WORKDIR /temp/guacamole-server-0.9.14
+RUN ./configure #--with-init-dir=/etc/init.d
+
+RUN make
+RUN make install
+RUN ldconfig
+
+ARG UID=1001
+ARG GID=1001
+RUN groupadd --gid $GID guacamole
+RUN useradd --system --create-home --shell /usr/sbin/nologin --uid $UID --gid $GID guacamole
+
+# Run with user guacamole
+USER guacamole
+
+# Start Guacamole under Tomcat, listening on 0.0.0.0:8080
+EXPOSE 808
+
+ENTRYPOINT ["/usr/local/sbin/guacd",  "-f"]
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

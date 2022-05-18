@@ -1,0 +1,75 @@
+# Dockerfile
+# syntax=docker/dockerfile:1
+
+# Dockerfile
+FROM debian:11
+#
+RUN echo 'deb  http://ftp.de.debian.org/debian/  oldoldstable main contrib non-free' >> /etc/apt/sources.list
+RUN echo 'deb-src  http://ftp.de.debian.org/debian/  oldoldstable main contrib non-free' >> /etc/apt/sources.list
+RUN echo 'deb  http://ftp.de.debian.org/debian/  oldstable main contrib non-free' >> /etc/apt/sources.list
+RUN echo 'deb-src  http://ftp.de.debian.org/debian/  oldstable main contrib non-free' >> /etc/apt/sources.list
+RUN echo 'deb  http://ftp.de.debian.org/debian/  stable main contrib non-free' >> /etc/apt/sources.list
+RUN echo 'deb-src  http://ftp.de.debian.org/debian/  stable main contrib non-free' >> /etc/apt/sources.list
+#
+#
+RUN apt-get update
+#
+RUN apt-get install -y gcc-6 g++-6
+RUN ln -s /usr/bin/gcc-6 /usr/bin/gcc
+#
+RUN apt-get install -y \
+    wget \
+    libcairo2-dev 	\
+    libjpeg62-turbo-dev \
+    libpng-dev \
+    libossp-uuid-dev \
+    libpango1.0-dev \
+    libssh2-1-dev \
+    libssl-dev \
+    uuid-dev \
+    make
+
+RUN mkdir "/temp"
+WORKDIR /temp
+RUN wget https://archive.apache.org/dist/guacamole/0.9.14/source/guacamole-server-0.9.14.tar.gz
+RUN tar xzf guacamole-server-0.9.14.tar.gz
+WORKDIR /temp/guacamole-server-0.9.14
+RUN ./configure #--with-init-dir=/etc/init.d
+
+RUN make
+RUN make install
+RUN ldconfig
+
+USER root
+
+RUN apt-get install -y  \
+    tomcat9
+
+
+RUN mkdir /etc/guacamole
+RUN wget https://archive.apache.org/dist/guacamole/0.9.14/binary/guacamole-0.9.14.war -P ~
+RUN mv ~/guacamole-0.9.14.war /etc/guacamole/guacamole.war
+
+RUN find / -name "webapp*"
+RUN ls /var/lib/tomcat9
+RUN ln -s /etc/guacamole/guacamole.war /var/lib/tomcat9/webapps/guacamole.war
+#RUN ln -s /etc/guacamole /var/lib/tomcat9/.guacamole
+
+RUN systemctl enable tomcat
+
+EXPOSE 8080
+ENTRYPOINT ["/usr/local/sbin/guacd",  "-f"]
+
+
+
+
+
+
+
+
+
+
+
+
+
+
