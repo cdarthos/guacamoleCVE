@@ -1,0 +1,23 @@
+version: '3.1'
+
+services:
+  guacamole09:
+    container_name: guacamole09
+    build:
+      context: ./guacamole09
+      dockerfile: Dockerfile
+
+  guacamole10:
+    container_name: guacamole10
+    build:
+      context: ./guacamole10
+      dockerfile: Dockerfile
+
+  nginx:
+    container_name: nginx09
+    image: nginx
+    ports:
+      - 18088:80
+    volumes:
+      - ./nginx/conf.d/:/etc/nginx/conf.d/
+      - ./nginx/log/:/var/log/nginx/
