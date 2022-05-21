@@ -18,6 +18,7 @@ services:
     image: nginx
     ports:
       - 18088:80
+      - 18089:81
     volumes:
       - ./nginx/conf.d/:/etc/nginx/conf.d/
       - ./nginx/log/:/var/log/nginx/
